@@ -54,5 +54,3 @@ export default class PostListItem extends Component{
         )
     }
 }
-
-

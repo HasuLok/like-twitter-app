@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/app/';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 // class WhoAmI extends Component{
 //   constructor(props){
 //     super(props);
