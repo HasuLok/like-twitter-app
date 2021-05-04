@@ -19,12 +19,12 @@ const Header = styled.div`
         color: grey;
     }
 `;
-
-const AppHeader = () => {
+// передам сюда props = {liked, allPosts} что бы динам-ки отрисовывать лайки посты
+const AppHeader = ({liked, allPosts}) => {
     return(
         <Header as='a'>
             <h1>Maksim Oreshkevich</h1>
-            <h2>5 Записей, из них понравилось 0</h2>
+            <h2>{allPosts} Записей, из них понравилось {liked}</h2>
         </Header>
     )
 }
