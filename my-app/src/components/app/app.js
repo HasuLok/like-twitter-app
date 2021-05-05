@@ -30,7 +30,8 @@ export default class App extends Component  {
                 {label:"That is good", important: false, like: false, id: 2},
                 {label:"I nead a break...", important: false, like: false, id: 3}
             ],
-            term: ''
+            term: '',    //это состояние будет сообщать пр-ю какю  инфу ищет юзр
+            filter: 'all'   //это состояние будет сообщать пр-ю как именно отфильровать посты  по дефолту будет показывать все посты 'all'
         };
         this.deleteItem = this.deleteItem.bind(this);
         this.addItem = this.addItem.bind(this);
@@ -39,6 +40,8 @@ export default class App extends Component  {
         this.onToggleLiked = this.onToggleLiked.bind(this);
 
         this.onUpdateSearch = this.onUpdateSearch.bind(this);
+
+        this.onFilterSelect = this.onFilterSelect.bind(this);
 
         this.maxId = 4;
     }
@@ -125,9 +128,24 @@ export default class App extends Component  {
              
 
     }
+    // ф-я апдейтит term 
     onUpdateSearch (term){
         this.setState({term})
     }
+    // ф-я принимает массив данных которые мы хотим фильтр-ть items 
+    // и filter - это то правила по которому мы будем фильтровать 
+    filterPost(items, filter){
+        if (filter === 'like'){
+            return items.filter(item => item.like ) // получим все эл-ты у которых лайк=тру
+        }else{
+            return items; // filter = all будем возвращать все э-ты 
+        }
+
+    }
+    onFilterSelect(filter){
+        this.setState({filter})
+    }
+
     render(){
         // создадим переменные что бы посчитать общее кол-во постов и для счетчика liked posts (счетчик в AppHeader)
 
@@ -139,13 +157,17 @@ export default class App extends Component  {
         // Теперь можно передать их в AppHeader для исп-вания
 
         // сократим немного запись сделав диструкт-е присв-е
-        const  {data, term} = this.state; 
+        const  {data, term, filter} = this.state; 
 
         const liked = data.filter(item => item.like).length;
         const allPosts = data.length;
 
         // создам п-ю с видимыми постами на основании того что ввел юзр
-        const visiblePosts = this.serachPost(data, term);
+        // сформируем все посты которые прошли 2ую фильтрацию 
+        // 1 фильтруються по строке которую юзер ввел или не ввел
+        // 2 фильтруються по нашему фильтру (лайков, лайк тру )
+        const visiblePosts = this.filterPost(this.serachPost(data, term), filter);
+
 
         return (
             <AppBlock>
@@ -156,7 +178,9 @@ export default class App extends Component  {
                     <SearchPanel
                     onUpdateSearch={this.onUpdateSearch}   // ф-я следит за стейтом и меняет его 
                     />        
-                    <PostStatusPanel/> 
+                    <PostStatusPanel
+                    filter={filter}
+                    onFilterSelect={this.onFilterSelect }/> 
                 </div>
                 <PostList posts={visiblePosts}             // вместо всех  постов {this.state.data} будет отображать только те которые ищет юзр  
                 onDelete={this.deleteItem}
