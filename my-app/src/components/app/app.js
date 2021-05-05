@@ -29,13 +29,16 @@ export default class App extends Component  {
                 {label:"Going to learn React", important: true, like: false, id: 1},
                 {label:"That is good", important: false, like: false, id: 2},
                 {label:"I nead a break...", important: false, like: false, id: 3}
-            ]
+            ],
+            term: ''
         };
         this.deleteItem = this.deleteItem.bind(this);
         this.addItem = this.addItem.bind(this);
 
         this.onToggleImportant = this.onToggleImportant.bind(this);
         this.onToggleLiked = this.onToggleLiked.bind(this);
+
+        this.onUpdateSearch = this.onUpdateSearch.bind(this);
 
         this.maxId = 4;
     }
@@ -104,7 +107,27 @@ export default class App extends Component  {
 
         });
     }
+    // напишу ф-ю которая исчет посты получая данные items в которых мы будем искать посты и строка поиска term
+    serachPost(items, term){
+            // через эту функцию нужно прогнать всю data и найти совпадения в этих данных 
+            // если пользователь ничего ещё не ввел мы ничего не делаем 
+        if(term.length === 0){
+            return items;
+        } 
+        // если юзер что то ввел 
+        //  в каждом эл-те будем находить св-во label и внутри этого св-ва будем находить то что ввел юзер
+        // если мы этого не нашли то мы получим -1 
+        // функция будет возвращать те посты в которых будет  то что ввел юзр
+        return items.filter((item) => {
+            return item.label.indexOf(term) > -1;
+        });
 
+             
+
+    }
+    onUpdateSearch (term){
+        this.setState({term})
+    }
     render(){
         // создадим переменные что бы посчитать общее кол-во постов и для счетчика liked posts (счетчик в AppHeader)
 
@@ -116,9 +139,13 @@ export default class App extends Component  {
         // Теперь можно передать их в AppHeader для исп-вания
 
         // сократим немного запись сделав диструкт-е присв-е
-        const  {data} = this.state; 
+        const  {data, term} = this.state; 
+
         const liked = data.filter(item => item.like).length;
         const allPosts = data.length;
+
+        // создам п-ю с видимыми постами на основании того что ввел юзр
+        const visiblePosts = this.serachPost(data, term);
 
         return (
             <AppBlock>
@@ -126,10 +153,12 @@ export default class App extends Component  {
                 liked={liked}
                 allPosts={allPosts}/>
                 <div className='search-panel d-flex'>
-                    <SearchPanel/>
-                    <PostStatusPanel/>
+                    <SearchPanel
+                    onUpdateSearch={this.onUpdateSearch}   // ф-я следит за стейтом и меняет его 
+                    />        
+                    <PostStatusPanel/> 
                 </div>
-                <PostList posts={this.state.data}
+                <PostList posts={visiblePosts}             // вместо всех  постов {this.state.data} будет отображать только те которые ищет юзр  
                 onDelete={this.deleteItem}
                 onToggleImportant={this.onToggleImportant}
                 onToggleLiked={this.onToggleLiked}/>
